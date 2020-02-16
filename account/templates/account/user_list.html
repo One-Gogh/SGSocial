@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Users{% endblock %}
+
+{% block content %}
+	<div id='user_list'>
+		{% for user in users %}
+			<img src="{% user.profile.photo %}">
+			<a href="{% user.get_absolute_url%}">{% if user.first_name %}{% user.get_full_name %}{% else %}{% user.username %}{% endif %}</a>
+
+		{% endfor %}
+	</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'images/base.html' %}
+{% block title %}All images{% endblock %}
+
+{% block content %}
+	{%for image in images%}
+		<img src="{{image.url}}">
+		{% with total_liked=image.users_liked.count users_liked=image.users_liked.all%}
+		<div>
+			<a href="#" data-id={{image.id}} data-action="{% if request.user in users_liked %}dis{% endif %}like" class="like">
+				{% if request.user in users_liked %}
+					Dislike
+				{% else %}
+					Like
+				{% endif %}
+			</a>
+			{{total_liked}} like{{total_liked|pluralize}}
+		</div>
+		<div>
+			User name 
+			{% if image.user.first_name %}
+				{{image.user.first_name}}
+			{% else %}
+				{{image.user.username}}
+			{% endif %}	
+			User photo <img src="{{image.user.profile.photo.url}}">
+		</div>
+		<div>
+			<p>ID:{{image.id}}</p>
+			<p>SLUG:{{image.slug}}</p>
+		</div>
+		{% endwith %}
+	{% endfor %}
+{% endblock %}
+
+{% block domready %}
+	$('a.like').click(function(e){
+		e.preventDefault();
+		var link = $(this);
+		var data_id = link.data('id');
+		$.post(
+		'{% url "images:like_image" %}',
+		{id: $(this).data('id'), action: $(this).data('action')},
+		function(data){
+			if (data['status'] == 200){
+				var previous_action = link.data('action');
+				// Изменяем переменную действия.
+				link.data('action', previous_action == 'like' ?'dislike' : 'like');
+				// Изменяем текст ссылки.
+				link.text(previous_action == 'like' ? 'Dislike' : 'Like');
+				// Обновляем общее количество лайков.
+				var previous_likes = parseInt($('span.count .total').text());
+				$('span.count .total').text(
+					previous_action == 'like' ? previous_likes + 1 : previous_likes - 1);
+			}
+		}
+		);
+	});
+{% endblock %}

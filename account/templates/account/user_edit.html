@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit profile{% endblock %}
+
+{% block content %}
+	<h1>Edit your account here.</h1>
+	<form action="." method="post" enctype="multipart/form-data">
+		{{user_edit_form.as_p}}
+		{{profile_edit_form.as_p}}
+		{% csrf_token %}
+		<input type='submit' value="Edit"></input>
+		<h1><a href="{% url 'password_change' %}">Change password</a></h1>
+	</form>
+{% endblock %}

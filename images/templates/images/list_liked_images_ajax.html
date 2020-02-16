@@ -1,0 +1,17 @@
+<div id="images_page_{{page}}">
+	{% for image in images %}
+		<div id='{{image.id}}' class="images_image">
+			<img src="{{image.url}}">
+			{% with total_liked=image.users_liked.count users_liked=image.users_liked.all%}
+				<a href="#" data-id={{image.id}} data-action="{% if request.user in users_liked %}dis{% endif %}like" class="like-button">
+					{% if request.user in users_liked %}
+						Dislike
+					{% else %}
+						Like
+					{% endif %}
+				</a>
+				<p>{{total_liked}} like{{total_liked|pluralize}}</p>
+			{% endwith %}
+		</div>
+	{% endfor %}
+</div>

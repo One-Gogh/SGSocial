@@ -1,0 +1,54 @@
+{% extends 'images/base.html' %}
+
+{% block title %}Liked images{% endblock %}
+
+{% block content %}
+	<div id="images">
+		{% include 'images/list_liked_images_ajax.html' %}
+	</div>
+{% endblock %}
+
+{% block domready %}
+	var page = 1;
+	var empty_page = false;
+	var block_request = false;
+	$(window).scroll(function() {
+		var margin = $(document).height() - $(window).height()-200;
+		if ($(window).scrollTop() > margin && empty_page == false &&
+		block_request == false) {
+			block_request = true;
+			page += 1;
+			$.get('?page=' + page, function(data) {
+				if(data == '') {empty_page = true;}
+				else {
+					block_request = false;
+					$('#images').append(data);
+				}
+			});
+		}
+	});
+
+	$('a.like').click(function(){
+		var link = $(this);
+		var data_id = link.data('id');
+
+		link.preventDefault();
+		$.post(
+		'{% url "images:like_image" %}',
+		{id: $(this).data('id'), action: $(this).data('action')},
+		function(data){
+			if (data['status'] == 200){
+				var previous_action = link.data('action');
+				// Изменяем переменную действия.
+				link.data('action', previous_action == 'like' ?'dislike' : 'like');
+				// Изменяем текст ссылки.
+				link.text(previous_action == 'like' ? 'Dislike' : 'Like');
+				// Обновляем общее количество лайков.
+				var previous_likes = parseInt($('span.count .total').text());
+				$('span.count .total').text(
+					previous_action == 'like' ? previous_likes + 1 : previous_likes - 1);
+			}
+		}
+		);
+	});
+{% endblock %}

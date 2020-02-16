@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	{% if user.first_name %}
+		{{ user.get_full_name }}
+	{% else %}
+		{{ user.username }}
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+	<h1>
+		{% if user.first_name %}
+			{{ user.get_full_name }}
+		{% else %}
+			{{ user.username }}
+		{% endif %}
+	</h1>
+	<img src="{{ user.profile.photo }}">
+	<a href="{% url 'user_edit' %}">Edit profile</a>
+	{% if user.profile.date_of_birth %}
+		<span>Date of birth: {{ user.profile.date_of_birth }}</span>
+	{% endif %}
+
+	{% with total_followers=user.followers.count %}
+		<p class="following">
+			<span class="total_followers">
+				<span class="total_followers_count">{{ total_followers }}</span> follower{{ total_followers | pluralize }}				
+			</span>
+			<a
+				href="#"
+				class="following_tofollow"
+				data-id="{{ user.id }}"
+				data-action="
+				{% if request.user != user and request.user in user.followers.all %}
+					un
+				{% endif %}
+				follow">
+				{% if request.user == user %}
+
+				{% elif request.user != user and request.user in user.followers.all %}
+					Unfollow
+				{% else %}
+					Follow
+				{% endif %}
+			</a>
+		</p>
+
+		<div id="image_list">
+			{% include 'images/all_images.html' with images=user.images_created.all %}
+		</div>
+	{% endwith %}
+{% endblock %}
+
+{% block domready %}
+	$('a.following_tofollow').click(function(obj){
+		obj.preventDefault();
+		$.post("{% url 'follow' %}", {
+			'id':$(this).data('id'),
+			'action':$(this).data('action')
+			},
+			function(response){
+				if(response['status'] == 200){
+					var previous_action = $('a.following_tofollow').data('action');
+
+					$('a.following_tofollow').data('action', previous_action == 'follow'?'unfollow':'follow')
+					$('a.following_tofollow').text(previous_action == 'follow'?'Unfollow':'Follow')
+
+					var total_followers = parseInt($('span.total_followers_count').text());
+					$('span.total_followers_count').text(previous_action == 'follow'?total_followers+1:total_followers-1);
+				}
+			};
+		);
+	};)
+{% endblock %}
