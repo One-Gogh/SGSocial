@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponse
 from .forms import AddImageForm
 from .models import Image
+from events.utils import create_event
 from common.decorators import ajax_required
 
 @login_required
@@ -16,6 +17,7 @@ def add_image(request):
 			image = form.save(commit=False)
 			image.user = request.user
 			image.save()
+			create_event(request.user, 'add image', image)
 
 			messages.success(request, 'Image has been successfully0 added!')
 			return redirect(image.get_absolute_url())
@@ -38,6 +40,7 @@ def like_image(request):
 			image = Image.objects.get(id=image_id)
 			if action == 'like':
 				image.users_liked.add(request.user)
+				create_event(request.user, 'like', image)
 			elif action == 'dislike':
 				image.users_liked.remove(request.user)
 				return JsonResponse({'status':200})

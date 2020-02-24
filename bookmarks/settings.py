@@ -13,7 +13,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 ABSOLUTE_URL_OVERRIDES = {
-    'auth.user' : lambda u: reverse_lazy('user', args=[u.username])
+    'auth.user' : lambda u: reverse_lazy('account:user', args=[u.username])
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'images.apps.ImagesConfig'
+    'images.apps.ImagesConfig',
+    'events'
 
 ]
 

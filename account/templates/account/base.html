@@ -11,20 +11,20 @@
 			<div id="thumbnail_mypage">
 				<a class="kek" href="#"><img src="{{request.user.profile.image}}" width=30px height=30px>{{request.user.username}}</a>
 				<ul id="thumbnail_mypage_ul">
-					<li id="thumbnail_mypage_li_2"><a href="{% url 'account:user' request.user.username %}">My page</a> </li>
+					<li id="thumbnail_mypage_li_2"><a href="{% url 'user' request.user.username %}">My page</a> </li>
 					<div id="mypage_sep"></div>
-					<li id="thumbnail_mypage_li_3"><a href="{% url 'account:user_edit' %}">Edit profile</a></li>
-					<li id="thumbnail_mypage_li_4"><a href="{% url 'account:logout' %}">Logout</a></li>
+					<li id="thumbnail_mypage_li_3"><a href="{% url 'user_edit' %}">Edit profile</a></li>
+					<li id="thumbnail_mypage_li_4"><a href="{% url 'logout' %}">Logout</a></li>
 				</ul>
 			</div>
 
 		</header>
 		<ul id="sidebar">
 			<li {% if section == 'my_page' %} id="sidebar_mypage" class='selected'{% endif %}>
-				<p><a href="{% url 'account:user' request.user.username %}">My page</a></p>
+				<p><a href="{% url 'user' request.user.username %}">My page</a></p>
 			</li>
 			<li {% if section == 'feed' %} id="sidebar_feed" class='selected'{% endif %}>
-				<p><a href="{% url 'account:feed' %}">Feed</a></p>
+				<p><a href="{% url 'feed' %}">Feed</a></p>
 			</li>
 			<li {% if section == 'friends' %} id="sidebar_friends" class='selected'{% endif %}>
 				<p><a href="#">Friends</a></p>
@@ -36,7 +36,7 @@
 	{% else %}
 		<header id="header">
 			<div id="thumbnail_mypage">
-				<a href="{% url 'account:login' %}">Log in</a>
+				<a href="{% url 'login' %}">Log in</a>
 			</div>
 		</header>
 	{% endif %}

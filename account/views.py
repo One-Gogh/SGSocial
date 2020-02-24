@@ -9,8 +9,10 @@ from django.views.decorators.http import require_POST
 from common.decorators import ajax_required
 from django.http import JsonResponse
 from .models import Contact
+from events.utils import create_event
 
-def login(request):
+
+'''def user_login(request):
 	if request.method == 'POST':
 		login_form = LoginForm(request.POST)
 		if login_form.is_valid():
@@ -21,12 +23,10 @@ def login(request):
 				if user.is_active:
 					login(request, user)
 					return HttpResponse('Login successfully!')
-				else: return HttpResponse('Login failed!')
-			else: return HttpResponse('Login failed!')
 		else: return HttpResponse('Login failed!')
 	else:
 		login_form = LoginForm()
-		return render(request, 'account/login.html', {'login_form':login_form})
+		return render(request, 'account/login.html', {'login_form':login_form})'''
 
 def user_registration(request):
 	if request.method == "POST":
@@ -37,10 +37,13 @@ def user_registration(request):
 			new_user.save()
 
 			Profile.objects.create(user=new_user)
-			return render(request, 'account/user_registration_done.html', {'new_user':new_user})
+			create_event(new_user, 'created account')
+			return render(request, 'account/user_registration_done.html',
+						{'new_user':new_user})
 	else:
 		user_registration_form = UserRegistrationForm()
-		return render(request, 'account/user_registration.html', {'user_registration_form':user_registration_form})
+		return render(request, 'account/user_registration.html',
+					{'user_registration_form':user_registration_form})
 
 @login_required
 def user_edit(request):
@@ -57,9 +60,8 @@ def user_edit(request):
 	else:
 		user_edit_form = UserEditForm(instance=request.user)
 		profile_edit_form = ProfileEditForm(instance=request.user.profile)
-
-		return render(request, 'account/user_edit.html', {'user_edit_form':user_edit_form,
-															'profile_edit_form':profile_edit_form})
+		return render(request, 'account/user_edit.html',
+					{'user_edit_form':user_edit_form, 'profile_edit_form':profile_edit_form})
 
 @login_required
 def feed(request):
@@ -87,6 +89,7 @@ def user_follow(request):
 			user_to = User.objects.get(id=user_id)
 			if user_action == 'follow':
 				Contact.user_from.get_or_create(user_from=request.user, user_to=user_to)
+				create_event(request.user, 'is following', user_to)
 			else:
 				Contact.user_from.filter(user_from=request.user, user_to=user_to).delete()
 		except:

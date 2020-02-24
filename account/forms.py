@@ -14,14 +14,14 @@ class UserRegistrationForm(forms.ModelForm):
 		model = User
 		fields = ('username', 'first_name', 'email')
 
-	def clean(self): #Костыль. Плохой
+	def clean_email(self): 
 		if self.cleaned_data['email']:
-
 			email = self.cleaned_data['email']
+
 			if User.objects.filter(email=email).exists():
 				raise forms.ValidationError('Email exists')
+		else:
 			return self.cleaned_data
-		return self.cleaned_data
 
 	def clean_second_password(self):
 		cd = self.cleaned_data
